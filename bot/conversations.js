@@ -64,12 +64,12 @@ export async function addItem(conversation, ctx) {
 		return
 	}
 	let item = ctx.message.text
-	// if (!new RegExp(/[a-zA-Z]+:\/\/[a-zA-Z]+\.[a-zA-Z]+\/[A-Za-z0-9]+/).test(item)) {
-	// 	await deleteMsg(ctx, ask.chat.id, ask.message_id)
-	// 	ask = await ctx.reply(`⛔ Wrong link format`)
-	// 	return deleteMsgTime(ctx, ask.chat.id, ask.message_id)
-	// }
-	// if (current === 'youtube') item = item.slice(20)
+	if (!new RegExp(/[a-zA-Z]+:\/\/[a-zA-Z]+\.[a-zA-Z]+\/[A-Za-z0-9]+/).test(item)) {
+		await deleteMsg(ctx, ask.chat.id, ask.message_id)
+		ask = await ctx.reply(`⛔ Wrong link format`)
+		return deleteMsgTime(ctx, ask.chat.id, ask.message_id)
+	}
+	if (current === 'youtube') item = item.slice(20)
 	if (current === 'vk') item = item.slice(15)
 	if (current === 'targets') {
 		item = "@" + item.slice(13)
