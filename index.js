@@ -15,7 +15,6 @@ const port = process.env.PORT || 3000;
 // //	ca: ca
 // };
 // const httpsServer = https.createServer(credentials, app);
-
 app.listen(port, () => {
     console.log('Server is up on port: ' + port);
 })

@@ -1,18 +1,16 @@
 import {google} from 'googleapis';
 import User from '../models/users.js';
 
-const YOUR_CLIENT_ID = '117644416177-tlacpuvguv1vrlhrprmtaa8476ufdlgj.apps.googleusercontent.com'
-const YOUR_CLIENT_SECRET = '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'
-const YOUR_REDIRECT_URL = 'https://yuron.xyz/api/googleauth'
-
 const oauth2Client = new google.auth.OAuth2(
-	YOUR_CLIENT_ID,
-	YOUR_CLIENT_SECRET,
-	YOUR_REDIRECT_URL
+	process.env.GOOGLE_CLIENT_ID,
+	process.env.GOOGLE_CLIENT_SECRET,
+	process.env.GOOGLE_REDIRECT_URL
 );
 
 const scopes = [
-  'https://www.googleapis.com/auth/youtube'
+  'https://www.googleapis.com/auth/youtube.readonly',
+//   'https://www.googleapis.com/auth/userinfo.profile',
+//   'https://www.googleapis.com/auth/userinfo.email',
 ];
 
 const googleAuthURL = function (state) {
@@ -27,8 +25,8 @@ const googleAuthURL = function (state) {
 oauth2Client.on('tokens', async (tokens) => {
 	try {
 		if (tokens.refresh_token) {
-			const user = User.findOne({ data: {
-				auth: {
+			const user = User.findOne({ value: {
+				auths: {
 				  	googleAuth: {
 					  	refresh_token: tokens.refresh_token
 				  	}
@@ -37,8 +35,8 @@ oauth2Client.on('tokens', async (tokens) => {
 			if (!user) {
 				return console.log('Google user not found for refresh token')
 			}
-			user.data.auths.googleAuth = tokens
-			user.markModified('data')
+			user.value.auths.googleAuth = tokens
+			user.markModified('value')
 			await user.save()
 		}
 	}
@@ -51,19 +49,19 @@ oauth2Client.on('tokens', async (tokens) => {
 const googleAuth = async function (req, res) {
 	const key = req.query.state
     const code = req.query.code
-	const {tokens} = await oauth2Client.getToken(code)
 	try {
+		const {tokens} = await oauth2Client.getToken(code)
 		const user = await User.findOne({ key })
-		if (!user) return res.send('Auth tokens not saved')
-		user.data.auths.googleAuth = tokens
-		user.markModified('data')
+		if (!user) return res.send('Authentication tokens not saved')
+		user.value.auths.googleAuth = tokens
+		user.markModified('value')
 		await user.save()
 	}
 	catch (e) {
 		console.log('Problem with database using googleAuth\n', e)
-		return res.send('Auth tokens not recived')
+		return res.send('Authentication tokens not recived')
 	}
 
-	res.send('done')
+	res.send('Authenticated, you can close the page now')
 }
 export { googleAuth, googleAuthURL, oauth2Client };

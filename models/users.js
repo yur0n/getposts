@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
-import '../database/connection.js'
 
-const schema = new mongoose.Schema({
-    key: 'string',
-    data: {},
+const schema = new mongoose.Schema ({
+    key: String,
+	value: Object
 })
-export default mongoose.model('User', schema)
+
+export default mongoose.model('user', schema)

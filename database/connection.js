@@ -1,5 +1,8 @@
-import { connect, set } from "mongoose"
+import mongoose from "mongoose"
 
-set('strictQuery', true)
+//prod 1 is for getposts api reqeusts, non-prod (0) is for yuron.xyz api requests
+const prod = 0
+const address = prod ? process.env.MONGODB_CONNECTION_PROD : process.env.MONGODB_CONNECTION
 
-connect(`mongodb+srv://yur0n:786512@cluster0.0na8y.mongodb.net/getposts?retryWrites=true&w=majority`)
+mongoose.set('strictQuery', true)
+await mongoose.connect(address)

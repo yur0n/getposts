@@ -1,6 +1,9 @@
+import 'dotenv/config'
+import './database/connection.js'
 import express from 'express'
 const app = express()
 import './bot.js'
+import './workers/youtubeWork.js'
 import { googleAuth } from './controllers/googleAuth.js'
 
 app.use(express.json())
