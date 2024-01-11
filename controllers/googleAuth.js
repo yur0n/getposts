@@ -49,6 +49,7 @@ oauth2Client.on('tokens', async (tokens) => {
 const googleAuth = async function (req, res) {
 	const key = req.query.state
     const code = req.query.code
+	if (!code || !key) return res.send('Auth tokens not recived')
 	try {
 		const {tokens} = await oauth2Client.getToken(code)
 		const user = await User.findOne({ key })
