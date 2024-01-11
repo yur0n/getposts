@@ -6,30 +6,42 @@ import Lastpost from '../models/lastposts.js'
 
 const youtube = google.youtube({ version: 'v3', auth: oauth2Client})
 
-async function work() {
+async function worker() {
 	try {
 		const users = await User.find()
 		users.forEach(user => {
-			const tokens = user.value.auths.googleAuth
 			const bots = user.value.bots
-			if (Object.keys(bots).length === 0 || 
-				Object.keys(tokens).length === 0) return
-			oauth2Client.setCredentials(tokens)
+			const googleTokens = user.value.auths.googleAuth
+			const vkToken = user.value.auths.vkAuth
+			const otherServiceToken = 0 // to be implemented
+			if (Object.keys(bots).length === 0) return
+			if (googleTokens?.access_token) oauth2Client.setCredentials(googleTokens)
+
 			for (const bot in bots) {
 				const botToken = bots[bot].token
 				bots[bot].sources.youtube.forEach( source => {
 					bots[bot].targets.forEach(async target => {
-						await youtubeSearch(source, target, botToken)
+						await youtubeWork(source, target, botToken)
 					})
 				})
+				if (vkToken) {
+					bots[bot].sources.vk.forEach( source => {
+						bots[bot].targets.forEach(async target => {
+							await vkWork(source, target, botToken, vkToken)
+						})
+					})
+				}
+				if (otherServiceToken) {
+
+				}
 			}
 		})
 	} catch (e) {
-		console.log('Error in youtubeworker:\n\n', e)
+		console.log('Error in worker:\n\n', e)
 	}
 }
 
-async function youtubeSearch(source, target, bot) {
+async function youtubeWork(source, target, bot) {
 	try {
 		const link = await getVideo(source)
 		let lastDomain = await Lastpost.findOne({ domain: source, chat_id: target, bot })
@@ -40,7 +52,7 @@ async function youtubeSearch(source, target, bot) {
 		lastDomain.link = link
 		await lastDomain.save()
 		await axios.post(`https://api.telegram.org/bot${bot}/sendMessage`, {chat_id: target, text: link})
-	} catch(e) { console.log('Error in youtubesearch:\n\n', e) }
+	} catch(e) { console.log('Error in youtubeWork:\n\n', e) }
 }
 
 async function getVideo(channel) {
@@ -74,4 +86,5 @@ async function getPlaylistId(channel) {
 	}
 }
 
-work()
+
+// worker()
