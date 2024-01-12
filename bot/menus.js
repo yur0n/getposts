@@ -51,8 +51,7 @@ const sourceKey = new Menu('source-menu')
 	.text('🌐 YouTube',   
 		async ctx => {
 			if (!ctx.session.auths.googleAuth.access_token) {
-				const msg = await ctx.reply(`ℹ️ You have to authenticate YouTube first`)
-				await deleteMsgTime(ctx, msg.chat.id, msg.message_id, 4000)
+				replyAndDel(ctx, `ℹ️ You have to authenticate YouTube first`,  4000)
 				return ctx.menu.nav('auths-menu')
 			}
 			ctx.session.current.a = 'youtube'
@@ -62,8 +61,7 @@ const sourceKey = new Menu('source-menu')
 	.text('🌐 VK',
 		async ctx => {
 			if (!ctx.session.auths.vk) {
-				const msg = await ctx.reply(`ℹ️ You have to authenticate VK first`)
-				await deleteMsgTime(ctx, msg.chat.id, msg.message_id, 4000)
+				replyAndDel(ctx, `ℹ️ You have to authenticate VK first`,  4000)
 				return ctx.menu.nav('auths-menu')
 			}
 			ctx.session.current.a = 'vk'
