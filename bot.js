@@ -4,7 +4,7 @@ import { conversations, createConversation } from "@grammyjs/conversations";
 import { MongoDBAdapter } from "@grammyjs/storage-mongodb"
 
 import collection from './models/users.js'
-import { addBot, addItem, confirm } from './bot/conversations.js'
+import { addBot, addTarget, addSource, confirm } from './bot/conversations.js'
 import menuKey from './bot/menus.js'
 import { deleteMsgTime, deleteMsg } from './bot/functions.js';
 
@@ -15,7 +15,7 @@ bot.on('message', (ctx, next) => {
 		deleteMsgTime(ctx, ctx.message.chat.id, ctx.message.message_id, 60_000)
 		return next()
 	} 
-	deleteMsg(ctx, ctx.message.chat.id, ctx.message.message_id)
+	deleteMsg(ctx, ctx.from.id, ctx.message.message_id)
 	next()
 })
 
@@ -25,7 +25,10 @@ bot.use(session({
 		id: '',
 		first_name: '',
         auths: { 
-			googleAuth: { access_token: '' }, 
+			googleAuth: { 
+				access_token: '',
+				refresh_token: ''
+			}, 
 			vkAuth: '' 
 		},
 		bots: {},
@@ -36,7 +39,8 @@ bot.use(session({
 
 bot.use(conversations());
 bot.use(createConversation(addBot));
-bot.use(createConversation(addItem));
+bot.use(createConversation(addSource));
+bot.use(createConversation(addTarget));
 bot.use(createConversation(confirm));
 bot.use(menuKey)
 

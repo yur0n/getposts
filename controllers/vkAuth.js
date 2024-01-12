@@ -4,7 +4,7 @@ import User from '../models/users.js'
 export default async (req, res) => {
 	const code = req.query.code
 	const state = req.query.state
-	if (!code || !state) res.send('No data to authorize')
+	if (!code || !state) return res.send('No data to authorize')
     axios.get(process.env.VK_REDIRECT_LINK + code)
     .then(async data => {
         const user = await User.findOne({ key: state })
