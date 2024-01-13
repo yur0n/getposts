@@ -60,7 +60,7 @@ const sourceKey = new Menu('source-menu')
 	)
 	.text('🌐 VK',
 		async ctx => {
-			if (!ctx.session.auths.vk) {
+			if (!ctx.session.auths.vkAuth) {
 				replyAndDel(ctx, `ℹ️ You have to authenticate VK first`,  4000)
 				return ctx.menu.nav('auths-menu')
 			}
