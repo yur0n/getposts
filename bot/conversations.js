@@ -64,7 +64,7 @@ export async function addSource(conversation, ctx) {
 		source = source.split("/")[3]
 	}
 	if (current === 'youtube') {
-		if(!source.match(/^UC[a-zA-Z0-9]{15,25}$/)) {
+		if(!source.match(/^UC[a-zA-Z0-9-]{15,25}$/)) {
 			await deleteMsg(ctx, ask.chat.id, ask.message_id)
 			return replyAndDel(ctx, `⛔ Wrong Channel ID`)
 		}

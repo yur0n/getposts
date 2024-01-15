@@ -2,8 +2,17 @@ import vkWork from './workers/vkWork.js'
 import youtubeWork from './workers/youtubeWork.js'
 import { oauth2Client } from './controllers/googleAuth.js'
 import User from './models/users.js'
+import cron from 'node-cron'
+
+let time = 0
+// const time0 = 10 minutes 600_000
+// const time1 = 60 minutes 3_600_000
+// const time2 = 300 minutes 18_000_000
+const timeArr = [1, 2, 3, 4, 5]
 
 async function worker() {
+	if (time === 300) time = 0
+	time += 10
 	try {
 		const users = await User.find()
 		users.forEach(user => {
@@ -18,7 +27,11 @@ async function worker() {
 				const botToken = bots[bot].token
 				const options = bots[bot].options
 				if (options.pause) return
-				if (googleTokens.refresh_token) {
+				if (options.time === 0) {}
+				else if (options.time === 1 && timeArr.includes(time/60)) {}
+				else if (options.time === 2 && timeArr.includes(time/300)) {}
+				else return 
+				if (googleTokens?.refresh_token) {
 					bots[bot].sources.youtube.forEach( source => {
 						bots[bot].targets.forEach(async target => {
 							await youtubeWork(source, target, botToken, options)
@@ -42,4 +55,6 @@ async function worker() {
 	}
 }
 
-setInterval(worker, 600_000) //18_000_000
+cron.schedule('* */10 * * *', () => {
+	worker();
+});

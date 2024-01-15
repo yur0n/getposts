@@ -1,6 +1,5 @@
 import axios from 'axios'
 import Lastpost from '../models/lastposts.js'
-import { text } from 'express'
 
 const linkRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g
 
@@ -11,7 +10,7 @@ export default async (domain, chat_id, bot, access_token, options) => {
         params: {
             domain,
             access_token,
-            count: 2,
+            count: 3,
             v: 5.131,
         }
     })

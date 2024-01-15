@@ -22,14 +22,13 @@ export async function isAdmin(ctx, chat_id) {
 }
 
 export async function checkToken(ctx) {
-	const token = ctx.message.text
-	const ok = new RegExp(/^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$/).test(token)
+	const ok = ctx.message.text.match(/^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$/)
 	if (!ok) return false
 	return await axios.get(`https://api.telegram.org/bot${token}/getMe`)
 		.then(async (res) => {
 			const data = res.data.result
 			ctx.session.bots[data.username] = { name: data.first_name || data.username, id: data.id,
-				token: token, options: { pause: false, links: 0 }, sources: { youtube: [], vk: [] }, targets: [] }
+				token: token, options: { pause: false, links: 0, time: 1 }, sources: { youtube: [], vk: [] }, targets: [] }
 			return true
 		})
 		.catch(() => false)
@@ -128,6 +127,21 @@ export async function options(ctx, range) {
 		async ctx => {
 			const links = ctx.session.bots[ctx.session.current.bot].options.links
 			ctx.session.bots[ctx.session.current.bot].options.links = await (links + 1) % 3
+			ctx.menu.update()
+		}
+	)
+	.row()
+	.text(ctx => {
+		return '⏳ Time rule: ' + (() => {
+			const time = ctx.session.bots[ctx.session.current.bot].options.time
+			if(time === 0) return 'Every 10 minutes       | ✅⏹️⏹️'
+			if(time === 1) return 'Every 1 hour                | ⏹️✅⏹️'
+			if(time === 2) return 'Every 5 hours             | ⏹️⏹️✅'
+		})()
+	},
+		async ctx => {
+			const time = ctx.session.bots[ctx.session.current.bot].options.time
+			ctx.session.bots[ctx.session.current.bot].options.time = await (time + 1) % 3
 			ctx.menu.update()
 		}
 	)

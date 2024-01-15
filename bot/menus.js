@@ -38,7 +38,7 @@ const botKey = new Menu('bot-menu')
 			ctx.session.current.a = 'targets'
 			ctx.menu.nav('targets-menu')
 		}).row()
-	.submenu('Options', 'options-menu')
+	.submenu('📊 Options', 'options-menu')
 	.text('❌ Delete Bot',
 		async ctx => {
 				await ctx.conversation.enter('confirm')
@@ -49,9 +49,9 @@ const botKey = new Menu('bot-menu')
 
 const sourceKey = new Menu('source-menu')
 	.text('🌐 YouTube',   
-		async ctx => {
+		ctx => {
 			if (!ctx.session.auths.googleAuth.access_token) {
-				replyAndDel(ctx, `ℹ️ You have to authenticate YouTube first`,  4000)
+				replyAndDel(ctx, `ℹ️ You have to authenticate YouTube first`, 4000)
 				return ctx.menu.nav('auths-menu')
 			}
 			ctx.session.current.a = 'youtube'
@@ -59,9 +59,9 @@ const sourceKey = new Menu('source-menu')
 		}
 	)
 	.text('🌐 VK',
-		async ctx => {
+		ctx => {
 			if (!ctx.session.auths.vkAuth) {
-				replyAndDel(ctx, `ℹ️ You have to authenticate VK first`,  4000)
+				replyAndDel(ctx, `ℹ️ You have to authenticate VK first`, 4000)
 				return ctx.menu.nav('auths-menu')
 			}
 			ctx.session.current.a = 'vk'
