@@ -32,14 +32,14 @@ export default async (domain, chat_id, bot, access_token, options) => {
 			lastDomain.post = item.id
 			await lastDomain.save().catch(console.log)
 
-			let caption = item.text || item.copy_history[0]?.attachments[0].photo.text || 'Photo'
+			let caption = item.text || item.copy_history?.[0].attachments[0].photo.text || ''
 
 			if (caption.match(linkRegex))  {
 				if (links === 1) caption = caption.replace(linkRegex, '');
 				if (links === 2) return
 			}
-
-			if (checkClub) caption = caption.replace(/\[[a-z]+[0-9]+\|.*\]/g, '')            // Check in text [club2131|<<people.com>>]
+			 // Check in text [club2131|<<people.com>>]
+			if (caption.match(/\[[a-z]+[0-9]+\|.*\]/g)) caption = caption.replace(/\[[a-z]+[0-9]+\|.*\]/g, '')
 			let photos = []
 			let photoWidth = 0
 			let photo = ''
@@ -52,7 +52,13 @@ export default async (domain, chat_id, bot, access_token, options) => {
 			if (item.attachments[0]) {
 				// if (item.copy_history[0].attachments[0].photo) photos = item.copy_history[0].attachments[0].photo.sizes 
 				if (item.attachments[0].photo) photos = item.attachments[0].photo.sizes || []
-				else if (item.attachments[0].video) photos = item.attachments[0].video.image || []
+				else if (item.attachments[0].video) {
+					// const video = `https://vk.com/${domain}?w=wall${item.from_id}_${item.id}`
+					// axios.post(`https://api.telegram.org/bot${bot}/sendVideo`, {chat_id, video, caption})
+					// .catch(console.log)
+					// return
+					photos = item.attachments[0].video.image || []
+				}
 				else if (item.attachments[0].audio) photos = item.attachments[1].photo.sizes || []
 				else if (item.attachments[0].link) photos = item.attachments[0].link.photo?.sizes || []
 				photos.forEach(el => {
