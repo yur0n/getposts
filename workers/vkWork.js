@@ -66,6 +66,7 @@ export default async (domain, chat_id, bot, access_token, options) => {
 						photo = el.url
 					}
 				})
+				if (!photo) return
 				axios.post(`https://api.telegram.org/bot${bot}/sendPhoto`, {chat_id, photo, caption})
 				.catch((e) => console.log(e.response.data))
 				return
