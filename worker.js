@@ -20,17 +20,17 @@ async function worker() {
 			const googleTokens = user.value.auths.googleAuth
 			const vkToken = user.value.auths.vkAuth
 			const otherService = 0 // to be implemented
-			if (Object.keys(bots).length === 0) return // maybe delete
+			if (!Object.keys(bots).length) return // maybe delete
 			if (googleTokens?.refresh_token) oauth2Client.setCredentials(googleTokens)
 
 			for (const bot in bots) {
 				const botToken = bots[bot].token
 				const options = bots[bot].options
-				if (options.pause) return
+				if (options.pause) continue
 				if (options.time === 0) {}
 				else if (options.time === 1 && timeArr.includes(time/60)) {}
 				else if (options.time === 2 && timeArr.includes(time/300)) {}
-				else return 
+				else continue 
 				if (googleTokens?.refresh_token) {
 					bots[bot].sources.youtube.forEach( source => {
 						bots[bot].targets.forEach(async target => {
@@ -55,6 +55,6 @@ async function worker() {
 	}
 }
 
-cron.schedule('* */10 * * *', () => {
+cron.schedule('*/10 * * * *', () => {
 	worker();
 });
