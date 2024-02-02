@@ -31,16 +31,14 @@ const googleAuthURL = function (state) {
 oauth2Client.on('tokens', async (tokens) => {
 	try {
 		if (tokens.refresh_token) {
-			const user = User.findOne({ value: {
+			const user = await User.findOne({ value: {
 				auths: {
 				  	googleAuth: {
 					  	refresh_token: tokens.refresh_token
 				  	}
 			  	}
 			}})
-			if (!user) {
-				return console.log('Google user not found for refresh token')
-			}
+			if (!user) return
 			user.value.auths.googleAuth = {
 				access_token: tokens.access_token,
 				refresh_token: tokens.refresh_token
@@ -60,18 +58,18 @@ const googleAuth = async function (req, res) {
     const code = req.query.code
 	if (!code || !key) return res.send('Auth tokens not recived')
 	try {
-		const {tokens} = await oauth2Client.getToken(code)
 		const user = await User.findOne({ key })
 		if (!user) return res.send('Authentication tokens not saved')
+		const {tokens} = await oauth2Client.getToken(code)
 		user.value.auths.googleAuth.access_token = tokens.access_token
 		if (tokens.refresh_token) user.value.auths.googleAuth.refresh_token = tokens.refresh_token
 		user.markModified('value')
 		await user.save()
+		res.send('Authenticated, you can close the page now')
 	}
 	catch (e) {
 		console.log('Problem with database using googleAuth\n', e)
 		return res.send('Authentication tokens not recived')
 	}
-	res.send('Authenticated, you can close the page now')
 }
 export { googleAuth, googleAuthURL, oauth2Client, youtube };
