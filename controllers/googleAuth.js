@@ -39,12 +39,11 @@ oauth2Client.on('tokens', async (tokens) => {
 			}
 		}})
 		if (!user) return
-		user.value.auths.googleAuth = {
-			access_token: tokens.access_token,
-			refresh_token: tokens.refresh_token
+		if (tokens.access_token) {
+			user.value.auths.googleAuth.access_token = tokens.access_token
+			user.markModified('value')
+			user.save()
 		}
-		user.markModified('value')
-		await user.save()
 	}
 	catch (e) {
 		console.log('Problem with database updating googleAuth tokens\n', e)
